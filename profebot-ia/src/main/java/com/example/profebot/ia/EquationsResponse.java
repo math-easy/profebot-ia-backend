@@ -1,4 +1,4 @@
-package com.example.profebotia;
+package com.example.profebot.ia;
 
 import java.util.ArrayList;
 import java.util.List;

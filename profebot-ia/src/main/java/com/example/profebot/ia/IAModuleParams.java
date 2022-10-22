@@ -1,4 +1,4 @@
-package com.example.profebotia;
+package com.example.profebot.ia;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

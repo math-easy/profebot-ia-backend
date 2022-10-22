@@ -1,4 +1,4 @@
-package com.example.profebotia;
+package com.example.profebot.ia;
 
 public class ExpressionResponse {
     private String expressionAsInfix;
