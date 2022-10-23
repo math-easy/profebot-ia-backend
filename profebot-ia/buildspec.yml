@@ -18,7 +18,7 @@ phases:
       - mv target ..
       - cd ..
       - cd target
-      - mv profebotia-0.0.1-SNAPSHOT.jar application.jar
+      - mv profebot-ia-0.0.1-SNAPSHOT.jar application.jar
       - cp application.jar ..
 artifacts:
   files:
