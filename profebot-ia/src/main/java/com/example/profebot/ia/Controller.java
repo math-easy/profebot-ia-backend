@@ -20,7 +20,7 @@ public class Controller {
         return GeneticAlgorithmExecutor.execute("3(x+1)", "3(x+1)+5", "=").getEquations();
     }
 
-    @RequestMapping(value = "/api/more/practice", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/suggestions", method = RequestMethod.POST)
     public List<String> newEquationsSimilarTo(@RequestBody IAModuleParams params) {
         return GeneticAlgorithmExecutor.execute(params.getTerm(), params.getContext(), params.getRoot()).getEquations();
     }
