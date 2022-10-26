@@ -31,8 +31,8 @@ public class GeneticAlgorithm {
     }
 
     public String getExpressionMostSimilar() {
-        final Engine<ProgramGene<Double>, Double> engine = (Engine<ProgramGene<Double>, Double>)Engine.builder((Function)GeneticAlgorithm::fitnessFunction, (Codec)GeneticAlgorithm.CODEC).alterers((Alterer)new Mutator(0.03), new Alterer[] { new SingleNodeCrossover() }).populationSize(100).executor(Runnable::run).maximizing().build();
-        final Phenotype<ProgramGene<Double>, Double> bestExpression = (Phenotype<ProgramGene<Double>, Double>)engine.stream().limit(Limits.bySteadyFitness(20)).peek((Consumer)GeneticAlgorithm::showGeneration).collect(EvolutionResult.toBestPhenotype());
+        final Engine<ProgramGene<Double>, Double> engine = (Engine<ProgramGene<Double>, Double>)Engine.builder(GeneticAlgorithm::fitnessFunction, (Codec)GeneticAlgorithm.CODEC).alterers((Alterer)new Mutator(0.03), new Alterer[] { new SingleNodeCrossover() }).populationSize(100).executor(Runnable::run).maximizing().build();
+        final Phenotype<ProgramGene<Double>, Double> bestExpression = (Phenotype<ProgramGene<Double>, Double>)engine.stream().limit(Limits.bySteadyFitness(20)).peek(GeneticAlgorithm::showGeneration).collect(EvolutionResult.toBestPhenotype());
         final TreeNode bestCandidate = TreeNode.ofTree((Tree)bestExpression.getGenotype().getGene());
         return new Parser().getAsInfix((TreeNode<Op<Double>>)bestCandidate);
     }
@@ -48,6 +48,6 @@ public class GeneticAlgorithm {
     }
 
     static {
-        CODEC = Codec.of((Factory)Genotype.of((Chromosome) GeneticAlgorithmConfig.CHROMOSOME, new Chromosome[0]), (Function)Genotype::getGene);
+        CODEC = Codec.of((Factory)Genotype.of((Chromosome) GeneticAlgorithmConfig.CHROMOSOME, new Chromosome[0]), Genotype::getGene);
     }
 }

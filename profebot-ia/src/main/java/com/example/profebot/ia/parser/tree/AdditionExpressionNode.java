@@ -58,7 +58,7 @@ public class AdditionExpressionNode extends SequenceExpressionNode {
 
     @Override
     public Integer getDegree() {
-        return this.terms.stream().map((Function<? super Object, ? extends Integer>)Term::getDegree).reduce(0, (max, nextDegree) -> Math.max(max, nextDegree));
+        return this.terms.stream().map(Term::getDegree).reduce(0, (max, nextDegree) -> Math.max(max, nextDegree));
     }
 
     @Override

@@ -33,7 +33,7 @@ public class MultiplicationExpressionNode extends SequenceExpressionNode {
 
     @Override
     public Integer getDegree() {
-        return this.terms.stream().map((Function<? super Object, ? extends Integer>)Term::getDegree).reduce(0, (total, aDegree) -> total + aDegree);
+        return this.terms.stream().map(Term::getDegree).reduce(0, (total, aDegree) -> total + aDegree);
     }
 
     @Override

@@ -36,7 +36,7 @@ public abstract class SimilarExpressionCalculator {
             final Integer degreeToUse = maxDegree;
         }
         else {
-            final Integer degreeToUse = reference.stream().filter(operator -> operator.getOperator().equals(12)).map((Function<? super Object, ? extends Integer>)Operator::getDegree).reduce(maxDegree, Math::min);
+            final Integer degreeToUse = reference.stream().filter(operator -> operator.getOperator().equals(12)).map(Operator::getDegree).reduce(maxDegree, Math::min);
         }
         final Integer degree = null;
         final Operator[] operator2 = new Operator[1];

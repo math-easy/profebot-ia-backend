@@ -3,9 +3,12 @@ package com.example.profebot.ia.parser.tree;
 import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
 import com.example.profebot.ia.parser.Operator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SequenceExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     protected List<Term> terms;
@@ -53,7 +56,7 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
     }
 
     public Integer maxLevelAgainst(final Integer level) {
-        return this.terms.stream().map((Function<? super Object, ? extends Integer>)Term::getLevel).reduce(level, Math::max);
+        return this.terms.stream().map(Term::getLevel).reduce(level, Math::max);
     }
 
     protected Integer getLevelFromBases(final Integer lowerBase, final Integer upperBase) {
@@ -155,7 +158,7 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
 
     @Override
     public ExpressionNode normalize() {
-        this.terms = this.terms.stream().map(term -> new Term(term.positive, term.normalize())).collect((Collector<? super Object, ?, List<Term>>)Collectors.toList());
+        this.terms = this.terms.stream().map(term -> new Term(term.positive, term.normalize())).collect(Collectors.toList());
         return this;
     }
 
@@ -178,7 +181,7 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
     }
 
     private ExpressionNode simplifySequenceWithVariables() {
-        final List<Term> termsSimplified = this.terms.stream().map((Function<? super Object, ?>)Term::simplify).collect((Collector<? super Object, ?, List<Term>>)Collectors.toList());
+        final List<Term> termsSimplified = this.terms.stream().map(Term::simplify).collect(Collectors.toList());
         final Map<String, Map<Term, Integer>> countOfTermsBySign = new HashMap<String, Map<Term, Integer>>();
         for (final Term term : termsSimplified) {
             final Map<Term, Integer> value = new HashMap<Term, Integer>();
