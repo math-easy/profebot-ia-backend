@@ -127,7 +127,7 @@ public class FunctionExpressionNode extends AbstractExpressionNode implements Ex
         if (str.equals("int")) {
             return 13;
         }
-        throw new ParseException("Unexpected Function " + str + " found!", 0);
+        throw new ParseException(0, "Unexpected Function " + str + " found!");
     }
 
     public static String getAllFunctions() {

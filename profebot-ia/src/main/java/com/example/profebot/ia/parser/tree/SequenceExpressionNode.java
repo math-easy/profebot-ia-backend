@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SequenceExpressionNode extends AbstractExpressionNode implements ExpressionNode {
+public abstract class SequenceExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     protected List<Term> terms;
 
     public SequenceExpressionNode() {
@@ -26,6 +26,21 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
     }
 
     @Override
+    public int getType() {
+        return 0;
+    }
+
+    @Override
+    public double getValue() {
+        return 0;
+    }
+
+    @Override
+    public Integer getLevel() {
+        return null;
+    }
+
+    @Override
     public Boolean hasVariable() {
         return this.terms.stream().anyMatch(Term::hasVariable);
     }
@@ -33,6 +48,11 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
     @Override
     public Boolean isNumber() {
         return this.terms.stream().allMatch(Term::isNumber);
+    }
+
+    @Override
+    public Boolean isLineal() {
+        return null;
     }
 
     @Override
@@ -144,6 +164,11 @@ public class SequenceExpressionNode extends AbstractExpressionNode implements Ex
             term.getStructureOf(expressionsWithArgumentStructures);
         }
         return expressionsWithArgumentStructures;
+    }
+
+    @Override
+    public Integer getToken() {
+        return null;
     }
 
     @Override

@@ -15,8 +15,8 @@ public class ExpressionsConfig {
     }
 
     static {
-        OPERATIONS = ISeq.of((Object[])new Op[] { MathOp.ADD, MathOp.SUB, MathOp.MUL, MathOp.DIV, MathOp.POW, MathOp.SQRT, MathOp.COS, MathOp.SIN, MathOp.TAN, ExtraMathOp.LN, ExtraMathOp.INTEGRAL, ExtraMathOp.DERIVATIVE, ExtraMathOp.LN, ExtraMathOp.LOG, ExtraMathOp.LOG2B });
+        OPERATIONS = ISeq.of(new Op[] { MathOp.ADD, MathOp.SUB, MathOp.MUL, MathOp.DIV, MathOp.POW, MathOp.SQRT, MathOp.COS, MathOp.SIN, MathOp.TAN, ExtraMathOp.LN, ExtraMathOp.INTEGRAL, ExtraMathOp.DERIVATIVE, ExtraMathOp.LN, ExtraMathOp.LOG, ExtraMathOp.LOG2B });
         VAR_X = (Op)Var.of("x", 0);
-        TERMINALS = ISeq.of((Object[])new Op[] { ExpressionsConfig.VAR_X, anyNumber() });
+        TERMINALS = ISeq.of(new Op[] { ExpressionsConfig.VAR_X, anyNumber() });
     }
 }

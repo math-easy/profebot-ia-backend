@@ -1,11 +1,16 @@
 package com.example.profebot.ia;
 
+import com.example.profebot.ia.algorithm.GeneticAlgorithm;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.springframework.scheduling.config.Task;
 
 public class GeneticAlgorithmExecutor {
     public static EquationsResponse execute(String aTermExpression, String aContextExpression, String root){
-        return new EquationsResponse(getMostSimilarExpressionTo(aTermExpression, "".equals(aContextExpression) ? aTermExpression : aContextExpression), root);
+      List<ExpressionResponse> list = getMostSimilarExpressionTo(aTermExpression, "".equals(aContextExpression) ? aTermExpression : aContextExpression);
+      EquationsResponse response = new EquationsResponse(list, root);
+      return response;
     }
 
     private static List<ExpressionResponse> getMostSimilarExpressionTo(String aTermExpression, String aContextExpression){
@@ -18,30 +23,14 @@ public class GeneticAlgorithmExecutor {
     }
 
     private static ExpressionResponse getNewExpressionFrom(String baseExpression){
-        ExpressionResponse response = ExpressionResponse.empty();
+        ExpressionResponse response;
         do {
-            //response = executor.submit(new Task(baseExpression)).get(5, TimeUnit.SECONDS);
-            // TODO: FIX
-            response = new ExpressionResponse("x + 2 = 1",0.75);
-        }while (!response.isValid());
-
+          GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(baseExpression);
+          String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
+          Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
+          response = new ExpressionResponse(mostSimilarExpression, similarity);
+        }while(!response.isValid());
         return response;
     }
 
-/*    static class Task implements Callable<ExpressionResponse> {
-
-        private String baseExpression;
-
-        public Task(String aBaseExpression){
-            baseExpression = aBaseExpression;
-        }
-
-        @Override
-        public ExpressionResponse call() throws Exception {
-            GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(this.baseExpression);
-            String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
-            Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
-            return new ExpressionResponse(mostSimilarExpression, similarity);
-        }
-    }*/
 }
