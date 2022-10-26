@@ -69,6 +69,7 @@ public class NeuralNetworkSimilarExpressionCalculator extends SimilarExpressionC
     private void trainWithExamples() {
         try {
             final DataSet ds = new DataSet(NeuralNetworkConfig.INPUTS);
+            System.out.println("EEEEEEEEEEEEEEEEE");
             final File file = new File("resources/training/patterns.text");
             final FileReader fileReader = new FileReader(file);
             final BufferedReader bufferedReader = new BufferedReader(fileReader);

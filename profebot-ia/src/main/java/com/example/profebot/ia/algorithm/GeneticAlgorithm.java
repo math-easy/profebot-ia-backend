@@ -1,53 +1,80 @@
 package com.example.profebot.ia.algorithm;
 
-import com.example.profebot.ia.config.*;
-import com.example.profebot.ia.fitness.*;
-import com.example.profebot.ia.parser.*;
-import io.jenetics.prog.*;
+import static com.example.profebot.ia.config.GeneticAlgorithmConfig.CHROMOSOME;
+import static com.example.profebot.ia.config.GeneticAlgorithmConfig.INITIAL_POPULATION_SIZE;
+import static com.example.profebot.ia.config.GeneticAlgorithmConfig.MIN_ITERATIONS;
+import static com.example.profebot.ia.config.GeneticAlgorithmConfig.MUTATION_PROB;
 
-import io.jenetics.ext.util.*;
-import io.jenetics.prog.op.*;
-import io.jenetics.ext.*;
-import java.util.function.*;
-import io.jenetics.engine.*;
-import io.jenetics.*;
-import io.jenetics.util.*;
+import com.example.profebot.ia.fitness.NeuralNetworkSimilarExpressionCalculator;
+import com.example.profebot.ia.fitness.ProceduralSimilarExpressionCalculator;
+import com.example.profebot.ia.fitness.SimilarExpressionCalculator;
+import com.example.profebot.ia.parser.Parser;
+import io.jenetics.Genotype;
+import io.jenetics.Mutator;
+import io.jenetics.Phenotype;
+import io.jenetics.engine.Codec;
+import io.jenetics.engine.Engine;
+import io.jenetics.engine.EvolutionResult;
+import io.jenetics.engine.Limits;
+import io.jenetics.ext.SingleNodeCrossover;
+import io.jenetics.ext.util.TreeNode;
+import io.jenetics.prog.ProgramGene;
 
 public class GeneticAlgorithm {
-    private static SimilarExpressionCalculator SIMILAR_EXPRESSION_CALCULATOR;
-    private static final Codec<ProgramGene<Double>, ProgramGene<Double>> CODEC;
 
-    public GeneticAlgorithm(final String candidate) {
-        GeneticAlgorithm.SIMILAR_EXPRESSION_CALCULATOR = new ProceduralSimilarExpressionCalculator(candidate);
-    }
+  // Define the structure of solutions (max tree depth, operations and terminals to consider, etc)
+  private static final Codec<ProgramGene<Double>, ProgramGene<Double>> CODEC = Codec.of(
+      Genotype.of(CHROMOSOME),
+      Genotype::getGene
+  );
+  // Define the fitness function
+  // static final SimilarExpressionCalculator SIMILAR_EXPRESSION_CALCULATOR = new NeuralNetworkSimilarExpressionCalculator(EXPRESSION);
+  private static SimilarExpressionCalculator SIMILAR_EXPRESSION_CALCULATOR;
 
-    public GeneticAlgorithm(final String candidate, final Boolean useNeuralNetworkFitness) {
-        GeneticAlgorithm.SIMILAR_EXPRESSION_CALCULATOR = (((boolean)useNeuralNetworkFitness) ? new NeuralNetworkSimilarExpressionCalculator(candidate) : new ProceduralSimilarExpressionCalculator(candidate));
-    }
+  public GeneticAlgorithm(String candidate) {
+    SIMILAR_EXPRESSION_CALCULATOR = new NeuralNetworkSimilarExpressionCalculator(candidate);
+  }
 
-    private static final Double fitnessFunction(final ProgramGene<Double> expression) {
-        final String otherExpression = new Parser().getAsInfix((TreeNode<Op<Double>>)TreeNode.ofTree((Tree)expression));
-        return GeneticAlgorithm.SIMILAR_EXPRESSION_CALCULATOR.similarityWith(otherExpression);
-    }
+  public GeneticAlgorithm(String candidate, Boolean useNeuralNetworkFitness) {
+    SIMILAR_EXPRESSION_CALCULATOR = useNeuralNetworkFitness ? new NeuralNetworkSimilarExpressionCalculator(candidate) :
+        new ProceduralSimilarExpressionCalculator(candidate);
+  }
 
-    public String getExpressionMostSimilar() {
-        final Engine<ProgramGene<Double>, Double> engine = (Engine<ProgramGene<Double>, Double>)Engine.builder(GeneticAlgorithm::fitnessFunction, (Codec)GeneticAlgorithm.CODEC).alterers((Alterer)new Mutator(0.03), new Alterer[] { new SingleNodeCrossover() }).populationSize(100).executor(Runnable::run).maximizing().build();
-        final Phenotype<ProgramGene<Double>, Double> bestExpression = (Phenotype<ProgramGene<Double>, Double>)engine.stream().limit(Limits.bySteadyFitness(20)).peek(GeneticAlgorithm::showGeneration).collect(EvolutionResult.toBestPhenotype());
-        final TreeNode bestCandidate = TreeNode.ofTree((Tree)bestExpression.getGenotype().getGene());
-        return new Parser().getAsInfix((TreeNode<Op<Double>>)bestCandidate);
-    }
+  private static final Double fitnessFunction(final ProgramGene<Double> expression) {
+    String otherExpression = new Parser().getAsInfix(TreeNode.ofTree(expression));
+    return SIMILAR_EXPRESSION_CALCULATOR.similarityWith(otherExpression);
+  }
 
-    public static void showGeneration(final EvolutionResult<ProgramGene<Double>, Double> generation) {
-        final TreeNode bestCandidate = TreeNode.ofTree((Tree)generation.getBestPhenotype().getGenotype().getGene());
-        final String candidateAsInfix = new Parser().getAsInfix((TreeNode<Op<Double>>)bestCandidate);
-        System.out.println("Generation: " + generation.getGeneration() + "; Best fitness: " + GeneticAlgorithm.SIMILAR_EXPRESSION_CALCULATOR.similarityWith(candidateAsInfix) + "; Best genotype: " + candidateAsInfix);
-    }
+  public static void showGeneration(EvolutionResult<ProgramGene<Double>, Double> generation) {
+    TreeNode bestCandidate = TreeNode.ofTree(generation.getBestPhenotype().getGenotype().getGene());
+    String candidateAsInfix = new Parser().getAsInfix(bestCandidate);
 
-    public SimilarExpressionCalculator getSimilarExpressionCalculator() {
-        return GeneticAlgorithm.SIMILAR_EXPRESSION_CALCULATOR;
-    }
+    System.out.println(
+        "Generation: " + generation.getGeneration() + "; " +
+            "Best fitness: " + SIMILAR_EXPRESSION_CALCULATOR.similarityWith(candidateAsInfix) + "; " +
+            "Best genotype: " + candidateAsInfix);
+  }
 
-    static {
-        CODEC = Codec.of((Factory)Genotype.of((Chromosome) GeneticAlgorithmConfig.CHROMOSOME, new Chromosome[0]), Genotype::getGene);
-    }
+  public String getExpressionMostSimilar() {
+    Engine<ProgramGene<Double>, Double> engine = Engine.builder(GeneticAlgorithm::fitnessFunction, CODEC)
+        .alterers(
+            new Mutator<>(MUTATION_PROB),
+            new SingleNodeCrossover<>())
+        .populationSize(INITIAL_POPULATION_SIZE)
+        .executor(Runnable::run)
+        .maximizing()
+        .build();
+
+    Phenotype<ProgramGene<Double>, Double> bestExpression = engine.stream()
+        .limit(Limits.bySteadyFitness(MIN_ITERATIONS))
+        .peek(GeneticAlgorithm::showGeneration)
+        .collect(EvolutionResult.toBestPhenotype());
+
+    TreeNode bestCandidate = TreeNode.ofTree(bestExpression.getGenotype().getGene());
+    return new Parser().getAsInfix(bestCandidate);
+  }
+
+  public SimilarExpressionCalculator getSimilarExpressionCalculator() {
+    return SIMILAR_EXPRESSION_CALCULATOR;
+  }
 }
