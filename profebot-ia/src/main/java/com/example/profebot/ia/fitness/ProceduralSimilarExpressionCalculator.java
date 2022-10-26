@@ -39,17 +39,17 @@ public class ProceduralSimilarExpressionCalculator extends SimilarExpressionCalc
     }
 
     public List<Operator> ignoreNumberValues(final List<Operator> operators) {
-        final Operator operator2;
+        final Operator[] operator2 = new Operator[1];
         return operators.stream().map(operator -> {
             if (operator.getOperator().equals(0)) {
                 // new(ia.module.parser.Operator.class)
                 new Operator(operator.getOperator(), 0);
             }
             else {
-                operator2 = operator;
+                operator2[0] = operator;
             }
-            return operator2;
-        }).collect((Collector<? super Object, ?, List<Operator>>)Collectors.toList());
+            return operator2[0];
+        }).collect(Collectors.toList());
     }
 
     public Double getComplexitySimilarity(final ExpressionNode originalExpressionTree, final ExpressionNode candidateExpressionTree) {
@@ -57,7 +57,7 @@ public class ProceduralSimilarExpressionCalculator extends SimilarExpressionCalc
         final List<Operator> candidateExpressionTokens = this.getListOfTokensOfNormalizedExpression(candidateExpressionTree);
         final List<Operator> intersection = this.getIntersection(originalExpressionTokens, candidateExpressionTokens);
         final List<Operator> union = this.getUnion(originalExpressionTokens, candidateExpressionTokens);
-        return (Double)(this.getWeight(intersection) / this.getWeight(union));
+        return Double.valueOf(this.getWeight(intersection) / this.getWeight(union));
     }
 
     private Long getWeight(final List<Operator> operators) {
@@ -65,17 +65,17 @@ public class ProceduralSimilarExpressionCalculator extends SimilarExpressionCalc
     }
 
     private List<Operator> getIntersection(final List<Operator> originalExpressionTokens, final List<Operator> candidateExpressionTokens) {
-        final Operator operator;
+        final Operator[] operator = new Operator[1];
         return originalExpressionTokens.stream().filter(token -> candidateExpressionTokens.stream().anyMatch(token1 -> token1.equals(token))).map(token -> {
             if (token.getOperator().equals(12)) {
                 // new(ia.module.parser.Operator.class)
                 new Operator(12, this.getIntersectionOfTermWithXByTermWithXDegrees(originalExpressionTokens, candidateExpressionTokens));
             }
             else {
-                operator = token;
+                operator[0] = token;
             }
-            return operator;
-        }).collect((Collector<? super Object, ?, List<Operator>>)Collectors.toList());
+            return operator[0];
+        }).collect(Collectors.toList());
     }
 
     private Integer getIntersectionOfTermWithXByTermWithXDegrees(final List<Operator> originalExpressionTokens, final List<Operator> candidateExpressionTokens) {

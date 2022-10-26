@@ -1,5 +1,12 @@
 package com.example.profebot.ia.parser.tree;
 
+import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
+import com.example.profebot.ia.parser.Operator;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+
 public class SequenceExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     protected List<Term> terms;
 

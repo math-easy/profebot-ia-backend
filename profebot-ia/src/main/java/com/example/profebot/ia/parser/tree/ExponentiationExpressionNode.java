@@ -1,5 +1,10 @@
 package com.example.profebot.ia.parser.tree;
 
+import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
+import com.example.profebot.ia.parser.Operator;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExponentiationExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     private ExpressionNode base;
     private ExpressionNode exponent;
@@ -15,7 +20,7 @@ public class ExponentiationExpressionNode extends AbstractExpressionNode impleme
     }
 
     @Override
-    public double getValue() throws EvaluationException {
+    public double getValue(){
         return Math.pow(this.base.getValue(), this.exponent.getValue());
     }
 

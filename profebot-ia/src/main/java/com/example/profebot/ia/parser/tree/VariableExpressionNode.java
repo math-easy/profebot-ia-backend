@@ -1,5 +1,11 @@
 package com.example.profebot.ia.parser.tree;
 
+import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
+import com.example.profebot.ia.parser.Operator;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.expression.EvaluationException;
+
 public class VariableExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     private String name;
     private double value;

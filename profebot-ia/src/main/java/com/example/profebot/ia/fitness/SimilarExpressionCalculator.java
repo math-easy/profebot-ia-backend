@@ -31,24 +31,24 @@ public abstract class SimilarExpressionCalculator {
     }
 
     private List<Operator> chooseTermWithVariableByTermWithVariableDegree(final List<Operator> reference, final List<Operator> result, final Boolean chooseMax) {
-        final Integer maxDegree = reference.stream().filter(operator -> operator.getOperator().equals(12)).map((Function<? super Object, ? extends Integer>)Operator::getDegree).reduce(0, Math::max);
+        final Integer maxDegree = reference.stream().filter(operator -> operator.getOperator().equals(12)).map(Operator::getDegree).reduce(0, Math::max);
         if (chooseMax) {
             final Integer degreeToUse = maxDegree;
         }
         else {
             final Integer degreeToUse = reference.stream().filter(operator -> operator.getOperator().equals(12)).map((Function<? super Object, ? extends Integer>)Operator::getDegree).reduce(maxDegree, Math::min);
         }
-        final Integer degree;
-        final Operator operator2;
+        final Integer degree = null;
+        final Operator[] operator2 = new Operator[1];
         return result.stream().map(operator -> {
             if (operator.getOperator().equals(12)) {
                 // new(ia.module.parser.Operator.class)
                 new Operator(operator.getOperator(), degree);
             }
             else {
-                operator2 = operator;
+                operator2[0] = operator;
             }
-            return operator2;
-        }).collect((Collector<? super Object, ?, List<Operator>>)Collectors.toList());
+            return operator2[0];
+        }).collect(Collectors.toList());
     }
 }

@@ -1,5 +1,6 @@
 package com.example.profebot.ia.parser.tree;
 
+import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
 import com.example.profebot.ia.parser.Operator;
 import java.util.*;
 

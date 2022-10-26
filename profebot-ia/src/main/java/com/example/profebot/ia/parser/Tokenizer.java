@@ -4,6 +4,7 @@ import com.example.profebot.ia.parser.tree.*;
 
 import java.util.*;
 import java.util.regex.*;
+import org.yaml.snakeyaml.parser.ParserException;
 
 public class Tokenizer {
     private LinkedList<TokenInfo> tokenInfos;

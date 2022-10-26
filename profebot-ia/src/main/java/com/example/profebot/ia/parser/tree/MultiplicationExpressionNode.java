@@ -1,5 +1,8 @@
 package com.example.profebot.ia.parser.tree;
 
+import java.util.List;
+import org.springframework.expression.EvaluationException;
+
 public class MultiplicationExpressionNode extends SequenceExpressionNode {
     public MultiplicationExpressionNode(final ExpressionNode a, final boolean positive) {
         super(a, positive);

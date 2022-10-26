@@ -11,7 +11,7 @@ public class ExpressionsWithArgumentStructures {
     }
 
     public ExpressionsWithArgumentStructures addExpressionWithArguments(final Integer dadToken, final Integer childToken) {
-        final List<ExpressionWithArgumentStructure> expressions = this.expressionsWithArgument.stream().filter(expressionWithArgumentStructure -> dadToken.equals(expressionWithArgumentStructure.getDadToken()) && childToken.equals(expressionWithArgumentStructure.getChildToken())).collect((Collector<? super Object, ?, List<ExpressionWithArgumentStructure>>)Collectors.toList());
+        final List<ExpressionWithArgumentStructure> expressions = this.expressionsWithArgument.stream().filter(expressionWithArgumentStructure -> dadToken.equals(expressionWithArgumentStructure.getDadToken()) && childToken.equals(expressionWithArgumentStructure.getChildToken())).collect(Collectors.toList());
         if (expressions.isEmpty()) {
             this.expressionsWithArgument.add(new ExpressionWithArgumentStructure(dadToken, childToken));
         }
@@ -34,7 +34,7 @@ public class ExpressionsWithArgumentStructures {
     }
 
     public ExpressionWithArgumentStructure find(final ExpressionWithArgumentStructure expressionWithArgumentStructure) {
-        final List<ExpressionWithArgumentStructure> structures = this.expressionsWithArgument.stream().filter(structure -> (structure.getDadToken().equals(expressionWithArgumentStructure.getDadToken()) && structure.getChildToken().equals(expressionWithArgumentStructure.getChildToken())) || this.haveEquivalentTokens(structure, expressionWithArgumentStructure)).collect((Collector<? super Object, ?, List<ExpressionWithArgumentStructure>>)Collectors.toList());
+        final List<ExpressionWithArgumentStructure> structures = this.expressionsWithArgument.stream().filter(structure -> (structure.getDadToken().equals(expressionWithArgumentStructure.getDadToken()) && structure.getChildToken().equals(expressionWithArgumentStructure.getChildToken())) || this.haveEquivalentTokens(structure, expressionWithArgumentStructure)).collect(Collectors.toList());
         if (structures.isEmpty()) {
             return null;
         }

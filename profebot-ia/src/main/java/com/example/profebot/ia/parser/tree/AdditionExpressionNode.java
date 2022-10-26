@@ -2,6 +2,7 @@ package com.example.profebot.ia.parser.tree;
 
 import java.util.*;
 import java.util.function.*;
+import org.springframework.expression.EvaluationException;
 
 public class AdditionExpressionNode extends SequenceExpressionNode {
     public AdditionExpressionNode() {

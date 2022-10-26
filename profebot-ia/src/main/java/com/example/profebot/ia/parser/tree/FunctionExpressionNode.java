@@ -5,6 +5,8 @@ import com.example.profebot.ia.parser.Operator;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.expression.EvaluationException;
+import org.springframework.expression.ParseException;
 
 public class FunctionExpressionNode extends AbstractExpressionNode implements ExpressionNode {
     public static final int SIN = 1;

@@ -1,5 +1,11 @@
 package com.example.profebot.ia.parser.tree;
 
+import com.example.profebot.ia.parser.ExpressionsWithArgumentStructures;
+import com.example.profebot.ia.parser.Operator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class Term {
     public boolean positive;
     public ExpressionNode expression;
@@ -57,7 +63,7 @@ public class Term {
         return this.expression.getDegree();
     }
 
-    public List<Operator> getListOfTokens() {
+    public Collection<? extends Operator> getListOfTokens() {
         final List<Operator> tokens = new ArrayList<Operator>();
         tokens.addAll(this.expression.getListOfTokens());
         return tokens;
