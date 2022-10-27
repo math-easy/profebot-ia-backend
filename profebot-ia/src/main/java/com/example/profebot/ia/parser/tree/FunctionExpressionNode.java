@@ -80,7 +80,7 @@ public class FunctionExpressionNode extends AbstractExpressionNode implements Ex
     @Override
     public Boolean isEven() {
         try {
-            return this.getValue() % 2.0 == 0.0;
+            return this.getValue() % 2 == 0;
         }
         catch (Exception e) {
             return false;

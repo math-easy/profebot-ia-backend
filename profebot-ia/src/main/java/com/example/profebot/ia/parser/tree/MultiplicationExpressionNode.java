@@ -1,122 +1,130 @@
 package com.example.profebot.ia.parser.tree;
 
-import java.util.List;
+import com.example.profebot.ia.parser.Operator;
 import org.springframework.expression.EvaluationException;
 
-public class MultiplicationExpressionNode extends SequenceExpressionNode {
-    public MultiplicationExpressionNode(final ExpressionNode a, final boolean positive) {
+import java.util.List;
+
+public class MultiplicationExpressionNode extends SequenceExpressionNode{
+
+    public MultiplicationExpressionNode(ExpressionNode a, boolean positive) {
         super(a, positive);
     }
 
-    public MultiplicationExpressionNode(final List<Term> terms) {
+    public MultiplicationExpressionNode(List<Term> terms) {
+        super();
         this.terms = terms;
     }
 
-    @Override
     public int getType() {
-        return 4;
+        return MULTIPLICATION_NODE;
     }
 
-    @Override
     public double getValue() throws EvaluationException {
         double prod = 1.0;
-        for (final Term t : this.terms) {
-            if (t.positive) {
+        for (Term t : terms) {
+            if (t.positive){
                 prod *= t.expression.getValue();
             }
-            else {
+            else{
                 prod /= t.expression.getValue();
             }
         }
         return prod;
     }
 
-    @Override
     public Integer getDegree() {
-        return this.terms.stream().map(Term::getDegree).reduce(0, (total, aDegree) -> total + aDegree);
+        return this.terms.stream()
+                .map(Term::getDegree)
+                .reduce(0, (total, aDegree) -> total + aDegree);
     }
 
-    @Override
-    public Integer getLevel() {
+    public Integer getLevel(){
         return this.getLevelFromBases(1, 4);
     }
 
-    @Override
     public Integer getToken() {
-        if (!this.hasVariable()) {
-            if (this.allPositives()) {
-                return 3;
+        if(!this.hasVariable()){
+            if(this.allPositives()){
+                return Operator.N_BY_N;
             }
-            return 5;
+
+            return Operator.N_DIVIDED_N;
         }
-        else {
-            if (this.terms.size() == 2 && this.onlyOneTermIsVariable()) {
-                return 8;
-            }
-            if (this.onlyOneTermIsVariable() || this.onlyOneTermIsLineal()) {
-                return 4;
-            }
-            if (this.onlyOneTermHasVariableAsFactor() && !this.onlyOneTermHasVariableAsDividend()) {
-                return 10;
-            }
-            if (this.onlyOneTermHasVariableAsDividend()) {
-                return 11;
-            }
-            if (this.towOrMoreTermsWithVariableAsFactors()) {
-                return 12;
-            }
-            if (this.anyTermWithVariableAsQuotient()) {
-                return 13;
-            }
-            return 0;
+
+        if(this.terms.size() == 2 && this.onlyOneTermIsVariable()){
+            return Operator.X;
         }
+
+        if(this.onlyOneTermIsVariable() || this.onlyOneTermIsLineal()){
+            return Operator.N_BY_X;
+        }
+
+        if(this.onlyOneTermHasVariableAsFactor() && !this.onlyOneTermHasVariableAsDividend()){
+            return Operator.BY_TERM_WITH_X;
+        }
+
+        if(this.onlyOneTermHasVariableAsDividend()){
+            return Operator.TERM_WITH_X_DIVIDED_N;
+        }
+
+        if(this.towOrMoreTermsWithVariableAsFactors()){
+            return Operator.TERM_WITH_X_BY_TERM_WITH_X;
+        }
+
+        if(this.anyTermWithVariableAsQuotient()){
+            return Operator.DIVIDED_TERM_WITH_X;
+        }
+
+        return Operator.N;
     }
 
-    private Boolean onlyOneTermIsVariable() {
-        return this.terms.stream().filter(Term::hasVariable).count() == 1L && this.terms.stream().filter(term -> term.isVariable() && term.positive).count() == 1L;
+    private Boolean onlyOneTermIsVariable(){
+        return this.terms.stream().filter(Term::hasVariable).count() == 1 &&
+                this.terms.stream().filter(term -> term.isVariable() && term.positive).count() == 1;
     }
 
-    private Boolean onlyOneTermIsLineal() {
-        return this.terms.stream().filter(Term::hasVariable).count() == 1L && this.terms.stream().filter(term -> term.hasVariable() && term.isLineal() && term.positive).count() == 1L;
+    private Boolean onlyOneTermIsLineal(){
+        return this.terms.stream().filter(Term::hasVariable).count() == 1 &&
+                this.terms.stream().filter(term -> term.hasVariable() && term.isLineal() && term.positive).count() == 1;
     }
 
-    private Long countOfTermsWithVariableAsFactor() {
+    private Long countOfTermsWithVariableAsFactor(){
         return this.terms.stream().filter(term -> term.hasVariable() && term.positive).count();
     }
 
     private Boolean onlyOneTermHasVariableAsFactor() {
-        return this.countOfTermsWithVariableAsFactor() == 1L && this.terms.stream().filter(term -> term.hasVariable() && !term.positive).count() == 0L;
+        return this.countOfTermsWithVariableAsFactor() == 1 && this.terms.stream().filter(term -> term.hasVariable() && !term.positive).count() == 0;
     }
 
-    private Boolean onlyOneTermHasVariableAsDividend() {
-        return this.onlyOneTermHasVariableAsFactor() && this.terms.stream().anyMatch(term -> (term.isNumber() && !term.positive) || term.isFractionalNumber());
+    private Boolean onlyOneTermHasVariableAsDividend(){
+        return this.onlyOneTermHasVariableAsFactor() &&
+                this.terms.stream().anyMatch(term -> (term.isNumber() && !term.positive) || term.isFractionalNumber());
     }
 
-    @Override
     public Boolean isQuadraticX() {
-        return (this.terms.stream().filter(Term::hasVariable).count() == 1L && this.terms.stream().filter(Term::isQuadraticX).count() == 1L) || (this.terms.stream().filter(Term::hasVariable).count() == 2L && this.terms.stream().filter(Term::isVariable).count() == 2L);
+        return (this.terms.stream().filter(Term::hasVariable).count() == 1 && this.terms.stream().filter(Term::isQuadraticX).count() == 1) ||
+                (this.terms.stream().filter(Term::hasVariable).count() == 2 && this.terms.stream().filter(Term::isVariable).count() == 2);
     }
 
-    private Boolean towOrMoreTermsWithVariableAsFactors() {
-        return this.countOfTermsWithVariableAsFactor() >= 2L;
+    private Boolean towOrMoreTermsWithVariableAsFactors(){
+        return this.countOfTermsWithVariableAsFactor() >= 2;
     }
 
-    private Boolean anyTermWithVariableAsQuotient() {
-        return this.terms.stream().filter(term -> term.hasVariable() && !term.positive).count() >= 1L;
+    private Boolean anyTermWithVariableAsQuotient(){
+        return this.terms.stream().filter(term -> term.hasVariable() && !term.positive).count() >= 1;
     }
 
-    @Override
     public Boolean isLineal() {
-        return this.terms.stream().filter(Term::hasVariable).count() <= 1L && this.terms.stream().filter(term -> term.hasVariable() && term.isLineal()).count() == 1L;
+        return this.terms.stream().filter(Term::hasVariable).count() <= 1 &&
+                this.terms.stream().filter(term -> term.hasVariable() && term.isLineal()).count() == 1;
     }
 
-    @Override
-    public Boolean isZero() {
+    public Boolean isZero(){
         return this.terms.stream().anyMatch(Term::isZero);
     }
 
-    @Override
-    public MultiplicationExpressionNode newSequenceWithTerms(final List<Term> terms) {
+    public MultiplicationExpressionNode newSequenceWithTerms(List<Term> terms){
         return new MultiplicationExpressionNode(terms);
     }
 }

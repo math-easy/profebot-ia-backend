@@ -42,7 +42,7 @@ public class ExponentiationExpressionNode extends AbstractExpressionNode impleme
     @Override
     public Boolean isEven() {
         try {
-            return this.getValue() % 2.0 == 0.0;
+            return this.getValue() % 2 == 0;
         }
         catch (Exception e) {
             return false;
@@ -176,7 +176,7 @@ public class ExponentiationExpressionNode extends AbstractExpressionNode impleme
         final ExpressionNode baseSimplified = this.base.simplify();
         final ExpressionNode exponentSimplified = this.exponent.simplify();
         if (exponentSimplified.isZero()) {
-            return new ConstantExpressionNode(1.0);
+            return new ConstantExpressionNode(1);
         }
         return new ExponentiationExpressionNode(baseSimplified, exponentSimplified);
     }

@@ -54,9 +54,9 @@ public class NeuralNetworkSimilarExpressionCalculator extends SimilarExpressionC
     private double fineAdjustment(final double[] candidateInput) {
         final Double originalExpressionInputCategory = this.category(this.originalExpressionInput);
         final Double candidateExpressionInputCategory = this.category(candidateInput);
-        final Double ratio = 1.0 - Math.abs(originalExpressionInputCategory - candidateExpressionInputCategory) / (originalExpressionInputCategory + candidateExpressionInputCategory);
+        final Double ratio = 1 - Math.abs(originalExpressionInputCategory - candidateExpressionInputCategory) / (originalExpressionInputCategory + candidateExpressionInputCategory);
         if (candidateExpressionInputCategory > originalExpressionInputCategory) {
-            return 1.0 - ratio;
+            return 1 - ratio;
         }
         return ratio;
     }

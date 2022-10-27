@@ -98,10 +98,12 @@ public abstract class AbstractExpressionNode {
         return Arrays.stream(features).map(feature -> feature / maxOrder).toArray();
     }
 
-    private Long getMaxOrder(final double[] features) {
-        Double max;
-        Long quotient;
-        for (max = Arrays.stream(features).reduce(0.0, Math::max), quotient = 1L; max / quotient >= 1.0; quotient *= 10L) {}
+    private Long getMaxOrder(double[] features){
+        Double max = Arrays.stream(features).reduce(0, Math::max);
+        Long quotient = 1L;
+        while(max / quotient >= 1){
+            quotient *= 10;
+        }
         return quotient;
     }
 }

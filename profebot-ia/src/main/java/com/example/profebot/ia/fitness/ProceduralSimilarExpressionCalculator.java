@@ -112,14 +112,14 @@ public class ProceduralSimilarExpressionCalculator extends SimilarExpressionCalc
     }
 
     private Double toRatio(final Long value) {
-        return 1.0 / (1.0 + value);
+        return 1 / (1 + value.doubleValue());
     }
 
     public Double getLevelSimilarityBetween(final ExpressionNode originalExpressionTree, final ExpressionNode candidateExpressionTree) {
         final Integer originalExpressionTreeLevel = originalExpressionTree.getLevel();
         final Integer candidateExpressionTreeLevel = candidateExpressionTree.getLevel();
         final Integer difference = Math.abs(originalExpressionTreeLevel - candidateExpressionTreeLevel);
-        return (10.0 - difference) / 10.0;
+        return (10 - difference.doubleValue()) / 10;
     }
 
     public ProceduralSimilarExpressionCalculator(final String originalExpression) {

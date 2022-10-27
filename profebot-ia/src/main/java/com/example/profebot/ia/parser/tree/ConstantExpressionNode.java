@@ -47,22 +47,22 @@ public class ConstantExpressionNode extends AbstractExpressionNode implements Ex
 
     @Override
     public Boolean isTwo() {
-        return this.value == 2.0;
+        return this.value == 2;
     }
 
     @Override
     public Boolean isOne() {
-        return this.value == 1.0;
+        return this.value == 1;
     }
 
     @Override
     public Boolean isZero() {
-        return this.value == 0.0;
+        return this.value == 0;
     }
 
     @Override
     public Boolean isN() {
-        return this.value >= 2.0;
+        return this.value >= 2;
     }
 
     @Override
@@ -72,12 +72,12 @@ public class ConstantExpressionNode extends AbstractExpressionNode implements Ex
 
     @Override
     public Boolean isPositiveNumber() {
-        return this.value > 0.0;
+        return this.value > 0;
     }
 
     @Override
     public Boolean isEven() {
-        return this.value % 2.0 == 0.0;
+        return this.value % 2 == 0;
     }
 
     @Override

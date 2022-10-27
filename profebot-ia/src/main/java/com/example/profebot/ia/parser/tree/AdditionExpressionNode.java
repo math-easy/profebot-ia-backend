@@ -1,68 +1,69 @@
 package com.example.profebot.ia.parser.tree;
 
-import java.util.*;
-import java.util.function.*;
+import com.example.profebot.ia.parser.Operator;
 import org.springframework.expression.EvaluationException;
 
-public class AdditionExpressionNode extends SequenceExpressionNode {
+import java.util.List;
+
+public class AdditionExpressionNode extends SequenceExpressionNode{
+
     public AdditionExpressionNode() {
+        super();
     }
 
-    public AdditionExpressionNode(final List<Term> terms) {
+    public AdditionExpressionNode(List<Term> terms) {
+        super();
         this.terms = terms;
     }
 
-    public AdditionExpressionNode(final ExpressionNode a, final boolean positive) {
+    public AdditionExpressionNode(ExpressionNode a, boolean positive) {
         super(a, positive);
     }
 
-    @Override
     public int getType() {
-        return 3;
+        return ADDITION_NODE;
     }
 
-    @Override
     public double getValue() throws EvaluationException {
         double sum = 0.0;
-        for (final Term t : this.terms) {
-            if (t.positive) {
+        for (Term t : terms) {
+            if (t.positive){
                 sum += t.expression.getValue();
             }
-            else {
+            else{
                 sum -= t.expression.getValue();
             }
         }
         return sum;
     }
 
-    @Override
-    public Integer getLevel() {
+    public Integer getLevel(){
         return this.getLevelFromBases(0, 3);
     }
 
-    @Override
     public Integer getToken() {
-        if (this.hasVariable()) {
-            return 9;
+        if(!this.hasVariable()){
+            if(this.allPositives()){
+                return Operator.N_PLUS_N;
+            }
+
+            return Operator.N_MINUS_N;
         }
-        if (this.allPositives()) {
-            return 1;
-        }
-        return 2;
+
+        return Operator.PLUS_OR_MINUS_TERM_WITH_X;
     }
 
-    @Override
     public Boolean isLineal() {
         return this.terms.stream().allMatch(Term::isLineal);
     }
 
-    @Override
-    public Integer getDegree() {
-        return this.terms.stream().map(Term::getDegree).reduce(0, (max, nextDegree) -> Math.max(max, nextDegree));
+    public Integer getDegree(){
+        return this.terms.stream()
+                .map(Term::getDegree)
+                .reduce(0, (max, nextDegree) -> Math.max(max, nextDegree));
     }
 
-    @Override
-    public AdditionExpressionNode newSequenceWithTerms(final List<Term> terms) {
+    public AdditionExpressionNode newSequenceWithTerms(List<Term> terms){
         return new AdditionExpressionNode(terms);
     }
 }
