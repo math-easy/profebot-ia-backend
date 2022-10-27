@@ -67,7 +67,7 @@ public class ConstantExpressionNode extends AbstractExpressionNode implements Ex
 
     @Override
     public Boolean isFractionalNumber() {
-        return this.value - (int)(Object)this.value > 0.0;
+        return (value - (value.intValue())) > 0;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ConstantExpressionNode extends AbstractExpressionNode implements Ex
     @Override
     public List<Operator> getListOfTokens() {
         final List<Operator> tokens = new ArrayList<Operator>();
-        tokens.add(Operator.newToken(this.getToken(), (int)(Object)this.value));
+        tokens.add(Operator.newToken(this.getToken(), this.value.intValue()));
         return tokens;
     }
 

@@ -27,21 +27,13 @@ public class GeneticAlgorithmExecutor {
 
 
   private static ExpressionResponse getNewExpressionFrom(String baseExpression){
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    ExpressionResponse response = ExpressionResponse.empty();
-    do {
-      try {
-        response = executor.submit(new Task(baseExpression)).get(5, TimeUnit.SECONDS);
-      } catch (Exception e) {
-        System.out.println("\n\n\n\nTimeout: " + e.getMessage() + "\n\n\n\n");
-        for (Thread thread : Thread.getAllStackTraces().keySet()) {
-          if (thread.getName().contains("pool-") && thread.getName().contains("thread-")) {
-            System.out.println("Thread stopped: " + thread.getName());
-            thread.stop();
-          }
-        }
-      }
-    }while (!response.isValid());
+      ExpressionResponse response;
+      do {
+      GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(baseExpression);
+      String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
+      Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
+      response = new ExpressionResponse(mostSimilarExpression, similarity);
+    }while(!response.isValid());
 
     return response;
   }

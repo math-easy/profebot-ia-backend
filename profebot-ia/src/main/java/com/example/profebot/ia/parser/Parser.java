@@ -1,277 +1,320 @@
 package com.example.profebot.ia.parser;
 
 import com.example.profebot.ia.parser.tree.*;
-import io.jenetics.ext.util.*;
-import io.jenetics.prog.op.*;
-
-import java.text.ParseException;
-import java.util.*;
+import io.jenetics.ext.util.TreeNode;
+import io.jenetics.prog.op.Op;
 import org.yaml.snakeyaml.parser.ParserException;
 
+import java.text.ParseException;
+import java.util.LinkedList;
+
 public class Parser {
+
     LinkedList<Token> tokens;
     Token lookahead;
 
-    public ExpressionNode parse(final TreeNode<Op<Double>> expression) throws ParserException, ParseException {
+    public ExpressionNode parse(TreeNode<Op<Double>> expression) throws ParserException, ParseException {
         return this.parse(this.getAsInfix(expression));
     }
 
-    public String getAsInfix(final TreeNode<Op<Double>> expression) {
-        try {
+    public String getAsInfix(TreeNode<Op<Double>> expression){
+        try{
             return Double.valueOf(expression.toString()).toString();
-        }
-        catch (Exception e) {
-            final String name;
-            final String currentExpression = name = ((Op)expression.getValue()).name();
-            switch (name) {
-                case "ADD": {
+        }catch (Exception e){
+            String currentExpression = expression.getValue().name();
+            switch (currentExpression){
+                case "ADD":
                     return this.sumOrMinusAsInfix(expression, "+");
-                }
-                case "SUB": {
+                case "SUB":
                     return this.sumOrMinusAsInfix(expression, "-");
-                }
-                case "MUL": {
+                case "MUL":
                     return this.mulOrDivOperation(expression, "*");
-                }
-                case "DIV": {
+                case "DIV":
                     return this.mulOrDivOperation(expression, "/");
-                }
-                case "POW": {
+                case "POW":
                     return this.powOperation(expression);
-                }
-                case "SQRT": {
+                case "SQRT":
                     return this.functionOperation(expression, "sqrt");
-                }
-                case "LN": {
+                case "LN":
                     return this.functionOperation(expression, "ln");
-                }
-                case "LOG": {
+                case "LOG":
                     return this.functionOperation(expression, "log");
-                }
-                case "LOG2B": {
+                case "LOG2B":
                     return this.functionOperation(expression, "log2b");
-                }
-                case "SIN": {
+                case "SIN":
                     return this.functionOperation(expression, "sin");
-                }
-                case "COS": {
+                case "COS":
                     return this.functionOperation(expression, "cos");
-                }
-                case "TAN": {
+                case "TAN":
                     return this.functionOperation(expression, "tan");
-                }
-                case "INTEGRAL": {
+                case "INTEGRAL":
                     return this.functionOperation(expression, "int");
-                }
-                case "DERIVATIVE": {
+                case "DERIVATIVE":
                     return this.functionOperation(expression, "dx");
-                }
-                default: {
+                default:
                     return currentExpression;
-                }
             }
         }
     }
 
-    private String sumOrMinusAsInfix(final TreeNode<Op<Double>> expression, final String operator) {
+    private String sumOrMinusAsInfix(TreeNode<Op<Double>> expression, String operator){
         String sum = "";
-        final Integer childCount = expression.childCount();
-        for (int i = 0; i < childCount; ++i) {
-            sum = sum + this.getAsInfix((TreeNode<Op<Double>>)expression.getChild(i)) + operator;
+        Integer childCount = expression.childCount();
+        for(int i = 0; i < childCount ; i++){
+            sum += this.getAsInfix(expression.getChild(i)) + operator;
         }
         return sum.substring(0, sum.length() - 1);
     }
 
-    private String mulOrDivOperation(final TreeNode<Op<Double>> expression, final String operator) {
+    private String mulOrDivOperation(TreeNode<Op<Double>> expression, String operator){
         String result = "";
-        final Integer childCount = expression.childCount();
-        for (int i = 0; i < childCount; ++i) {
-            result = result + "(" + this.getAsInfix((TreeNode<Op<Double>>)expression.getChild(i)) + ")" + operator;
+        Integer childCount = expression.childCount();
+        for(int i = 0; i < childCount ; i++){
+            result += "(" + this.getAsInfix(expression.getChild(i)) + ")" + operator;
         }
         return result.substring(0, result.length() - 1);
     }
 
-    private String powOperation(final TreeNode<Op<Double>> expression) {
+    private String powOperation(TreeNode<Op<Double>> expression){
         String result = "";
-        final Integer childCount = expression.childCount();
-        for (int i = 0; i < childCount; ++i) {
-            result = result + "(" + this.getAsInfix((TreeNode<Op<Double>>)expression.getChild(i)) + ")^";
+        Integer childCount = expression.childCount();
+        for(int i = 0; i < childCount ; i++){
+            result += "(" + this.getAsInfix(expression.getChild(i)) + ")" + "^";
         }
         return result.substring(0, result.length() - 1);
     }
 
-    private String functionOperation(final TreeNode<Op<Double>> expression, final String operator) {
+    private String functionOperation(TreeNode<Op<Double>> expression, String operator){
         String result = "";
-        final Integer childCount = expression.childCount();
-        for (int i = 0; i < childCount; ++i) {
-            result = result + operator + "(" + this.getAsInfix((TreeNode<Op<Double>>)expression.getChild(i)) + ")";
+        Integer childCount = expression.childCount();
+        for(int i = 0; i < childCount ; i++){
+            result += operator + "(" + this.getAsInfix(expression.getChild(i)) + ")";
         }
         return result;
     }
 
-    public ExpressionNode parse(final String expression) throws ParserException, ParseException {
-        final Tokenizer tokenizer = Tokenizer.getExpressionTokenizer();
+    public ExpressionNode parse(String expression) throws ParserException, ParseException{
+        Tokenizer tokenizer = Tokenizer.getExpressionTokenizer();
         tokenizer.tokenize(this.cleanFormatOf(expression));
-        final LinkedList<Token> tokens = tokenizer.getTokens();
+        LinkedList<Token> tokens = tokenizer.getTokens();
         return this.parse(tokens);
     }
 
-    public String cleanFormatOf(final String expression) {
-        String expressionCleaned = this.replaceComplexOperatorsNames(expression);
-        expressionCleaned = this.addMultiplicationSymbols(expressionCleaned);
-        return expressionCleaned.replaceAll("e", "2.718281828459045235360").replaceAll("pi", "3.14159265358979323846").replaceAll("\\)x", ")*x").replaceAll("\\)\\(", ")*(").replaceAll("x\\(", "x*(").replaceAll("dx\\*\\(", "dx(");
+    public String cleanFormatOf(String expression){
+        String expressionCleaned = expression;
+
+        expressionCleaned = replaceComplexOperatorsNames(expressionCleaned);
+        expressionCleaned = addMultiplicationSymbols(expressionCleaned);
+
+        return expressionCleaned
+                .replaceAll("e", "2.718281828459045235360")
+                .replaceAll("pi", "3.14159265358979323846")
+                .replaceAll("\\)x", ")*x")
+                .replaceAll("\\)\\(", ")*(")
+                .replaceAll("x\\(", "x*(")
+                .replaceAll("dx\\*\\(", "dx(");
     }
 
-    private String replaceComplexOperatorsNames(final String expression) {
-        return expression.replaceAll("derivative", "dx").replaceAll("integral", "int");
+    private String replaceComplexOperatorsNames(String expression) {
+        return expression
+                .replaceAll("derivative", "dx")
+                .replaceAll("integral", "int");
     }
 
-    private String addMultiplicationSymbols(String expression) {
-        for (int i = 0; i <= 9; ++i) {
-            expression = expression.replaceAll(i + "\\(", i + "*(").replaceAll(i + "sqrt", i + "*sqrt").replaceAll(i + "sin", i + "*sin").replaceAll(i + "cos", i + "*cos").replaceAll(i + "tan", i + "*tan").replaceAll(i + "ln", i + "*ln").replaceAll(i + "log", i + "*log").replaceAll(i + "log2b", i + "*log2b").replaceAll(i + "dx", i + "*dx").replaceAll(i + "int", i + "*int").replaceAll(i + "x", i + "*x");
+    private String addMultiplicationSymbols(String expression){
+        for(int i = 0 ; i <= 9 ; i++){
+            expression = expression
+                    .replaceAll(i + "\\(", i + "*(")
+                    .replaceAll(i + "sqrt", i + "*sqrt")
+                    .replaceAll(i + "sin", i + "*sin")
+                    .replaceAll(i + "cos", i + "*cos")
+                    .replaceAll(i + "tan", i + "*tan")
+                    .replaceAll(i + "ln", i + "*ln")
+                    .replaceAll(i + "log", i + "*log")
+                    .replaceAll(i + "log2b", i + "*log2b")
+                    .replaceAll(i + "dx", i + "*dx")
+                    .replaceAll(i + "int", i + "*int")
+                    .replaceAll(i + "x", i + "*x");
         }
         return expression;
     }
 
-    public ExpressionNode parse(final LinkedList<Token> tokens) throws ParseException, ParserException {
+    public ExpressionNode parse(LinkedList<Token> tokens) throws ParseException, ParserException{
         this.tokens = (LinkedList<Token>)tokens.clone();
-        this.lookahead = this.tokens.getFirst();
-        final ExpressionNode expr = this.expression();
-        if (this.lookahead.token != 0) {
-            throw new ParseException("Unexpected symbol " + this.lookahead + " found", 0);
+        lookahead = this.tokens.getFirst();
+
+        ExpressionNode expr = expression();
+
+        if (lookahead.token != Token.EPSILON){
+            //System.out.println(expression);
+            throw new ParseException("Unexpected symbol " + lookahead + " found", 0);
         }
+
         return expr;
     }
 
     private void nextToken() {
-        this.tokens.pop();
-        if (this.tokens.isEmpty()) {
-            this.lookahead = new Token(0, "", -1);
+        tokens.pop();
+        // at the end of input we return an epsilon token
+        if (tokens.isEmpty()){
+            lookahead = new Token(Token.EPSILON, "", -1);
         }
-        else {
-            this.lookahead = this.tokens.getFirst();
+        else{
+            lookahead = tokens.getFirst();
         }
     }
 
-    private ExpressionNode expression() throws ParseException {
-        final ExpressionNode expr = this.signedTerm();
-        return this.sumOp(expr);
+    private ExpressionNode expression() throws ParseException{
+        // expression -> signed_term sum_op
+        ExpressionNode expr = signedTerm();
+        return sumOp(expr);
     }
 
-    private ExpressionNode sumOp(final ExpressionNode expr) throws ParseException {
-        if (this.lookahead.token == 1) {
+    private ExpressionNode sumOp(ExpressionNode expr) throws ParseException{
+        // sum_op -> PLUSMINUS term sum_op
+        if (lookahead.token == Token.PLUSMINUS) {
             AdditionExpressionNode sum;
-            if (expr.getType() == 3) {
+            if (expr.getType() == ExpressionNode.ADDITION_NODE){
                 sum = (AdditionExpressionNode)expr;
-            }
-            else {
+            } else{
                 sum = new AdditionExpressionNode(expr, true);
             }
-            final boolean positive = this.lookahead.sequence.equals("+");
-            this.nextToken();
-            final ExpressionNode t = this.term();
+
+            boolean positive = lookahead.sequence.equals("+");
+            nextToken();
+            ExpressionNode t = term();
             sum.add(t, positive);
-            return this.sumOp(sum);
+
+            return sumOp(sum);
         }
+
+        // sum_op -> EPSILON
         return expr;
     }
 
-    private ExpressionNode signedTerm() throws ParseException {
-        if (this.lookahead.token != 1) {
-            return this.term();
+    private ExpressionNode signedTerm() throws ParseException{
+        // signed_term -> PLUSMINUS term
+        if (lookahead.token == Token.PLUSMINUS) {
+            boolean positive = lookahead.sequence.equals("+");
+            nextToken();
+            ExpressionNode t = term();
+            if (positive){
+                return t;
+            } else{
+                return new AdditionExpressionNode(t, false);
+            }
         }
-        final boolean positive = this.lookahead.sequence.equals("+");
-        this.nextToken();
-        final ExpressionNode t = this.term();
-        if (positive) {
-            return t;
-        }
-        return new AdditionExpressionNode(t, false);
+
+        // signed_term -> term
+        return term();
     }
 
-    private ExpressionNode term() throws ParseException {
-        final ExpressionNode f = this.factor();
-        return this.termOp(f);
+    private ExpressionNode term() throws ParseException{
+        // term -> factor term_op
+        ExpressionNode f = factor();
+        return termOp(f);
     }
 
-    private ExpressionNode termOp(final ExpressionNode expression) throws ParseException {
-        if (this.lookahead.token == 2) {
+    private ExpressionNode termOp(ExpressionNode expression) throws ParseException{
+        // term_op -> MULTDIV factor term_op
+        if (lookahead.token == Token.MULTDIV) {
             MultiplicationExpressionNode prod;
-            if (expression.getType() == 4) {
+
+            if (expression.getType() == ExpressionNode.MULTIPLICATION_NODE){
                 prod = (MultiplicationExpressionNode)expression;
             }
-            else {
+            else{
                 prod = new MultiplicationExpressionNode(expression, true);
             }
-            final boolean positive = this.lookahead.sequence.equals("*");
-            this.nextToken();
-            final ExpressionNode f = this.signedFactor();
+
+            boolean positive = lookahead.sequence.equals("*");
+            nextToken();
+            ExpressionNode f = signedFactor();
             prod.add(f, positive);
-            return this.termOp(prod);
+
+            return termOp(prod);
         }
+
+        // term_op -> EPSILON
         return expression;
     }
 
-    private ExpressionNode signedFactor() throws ParseException {
-        if (this.lookahead.token != 1) {
-            return this.factor();
+    private ExpressionNode signedFactor() throws ParseException{
+        // signed_factor -> PLUSMINUS factor
+        if (lookahead.token == Token.PLUSMINUS) {
+            boolean positive = lookahead.sequence.equals("+");
+            nextToken();
+            ExpressionNode t = factor();
+            if (positive){
+                return t;
+            }
+
+            return new AdditionExpressionNode(t, false);
         }
-        final boolean positive = this.lookahead.sequence.equals("+");
-        this.nextToken();
-        final ExpressionNode t = this.factor();
-        if (positive) {
-            return t;
-        }
-        return new AdditionExpressionNode(t, false);
+
+        // signed_factor -> factor
+        return factor();
     }
 
-    private ExpressionNode factor() throws ParseException {
-        final ExpressionNode a = this.argument();
-        return this.factorOp(a);
+    private ExpressionNode factor() throws ParseException{
+        // factor -> argument factor_op
+        ExpressionNode a = argument();
+        return factorOp(a);
     }
 
-    private ExpressionNode factorOp(final ExpressionNode expression) throws ParseException {
-        if (this.lookahead.token == 3) {
-            this.nextToken();
-            final ExpressionNode exponent = this.signedFactor();
+    private ExpressionNode factorOp(ExpressionNode expression) throws ParseException{
+        // factor_op -> RAISED factor
+        if (lookahead.token == Token.RAISED) {
+            nextToken();
+            ExpressionNode exponent = signedFactor();
+
             return new ExponentiationExpressionNode(expression, exponent);
         }
+
+        // factor_op -> EPSILON
         return expression;
     }
 
-    private ExpressionNode argument() throws ParseException {
-        if (this.lookahead.token == 4) {
-            final int function = FunctionExpressionNode.stringToFunction(this.lookahead.sequence);
-            this.nextToken();
-            final ExpressionNode expr = this.argument();
+    private ExpressionNode argument() throws ParseException{
+        // argument -> FUNCTION argument
+        if (lookahead.token == Token.FUNCTION) {
+            int function = FunctionExpressionNode.stringToFunction(lookahead.sequence);
+            nextToken();
+            ExpressionNode expr = argument();
             return new FunctionExpressionNode(function, expr);
+        } else if (lookahead.token == Token.OPEN_BRACKET){ // argument -> OPEN_BRACKET sum CLOSE_BRACKET
+            nextToken();
+            ExpressionNode expr = expression();
+            if (lookahead.token != Token.CLOSE_BRACKET){
+                throw new ParseException("Closing brackets expected: " + lookahead, 0);
+            }
+            nextToken();
+            return expr;
         }
-        if (this.lookahead.token != 5) {
-            return this.value();
-        }
-        this.nextToken();
-        final ExpressionNode expr2 = this.expression();
-        if (this.lookahead.token != 6) {
-            throw new ParseException("Closing brackets expected: " + this.lookahead, 0);
-        }
-        this.nextToken();
-        return expr2;
+
+        // argument -> value
+        return value();
     }
 
-    private ExpressionNode value() throws ParseException {
-        if (this.lookahead.token == 7) {
-            final ExpressionNode expr = new ConstantExpressionNode(this.lookahead.sequence);
-            this.nextToken();
+    private ExpressionNode value() throws ParseException{
+        // argument -> NUMBER
+        if (lookahead.token == Token.NUMBER) {
+            ExpressionNode expr = new ConstantExpressionNode(lookahead.sequence);
+            nextToken();
             return expr;
         }
-        if (this.lookahead.token == 8) {
-            final ExpressionNode expr = new VariableExpressionNode(this.lookahead.sequence);
-            this.nextToken();
+
+        // argument -> VARIABLE
+        if (lookahead.token == Token.VARIABLE) {
+            ExpressionNode expr = new VariableExpressionNode(lookahead.sequence);
+            nextToken();
             return expr;
         }
-        if (this.lookahead.token == 0) {
+
+        if (lookahead.token == Token.EPSILON){
             throw new ParseException("Unexpected end of input", 0);
+        } else{
+            throw new ParseException("Unexpected symbol " + lookahead + " found", 0);
         }
-        throw new ParseException("Unexpected symbol " + this.lookahead + " found", 0);
     }
 }
