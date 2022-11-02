@@ -13,14 +13,6 @@ public class EquationsResponse {
             if(expressionResponse.get(0).isValid()){
                 equationsList.add(newEquation(expressionResponse.get(0), root));
             }
-
-            if(expressionResponse.get(1).isValid()){
-                equationsList.add(newEquation(expressionResponse.get(1), root));
-            }
-
-            if(expressionResponse.get(2).isValid() && expressionResponse.get(3).isValid()){
-                equationsList.add(newEquation(expressionResponse.get(2), expressionResponse.get(3), root));
-            }
         }
 
         equations = equationsList;

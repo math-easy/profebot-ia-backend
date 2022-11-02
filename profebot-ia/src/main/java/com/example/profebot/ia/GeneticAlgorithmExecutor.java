@@ -19,40 +19,46 @@ public class GeneticAlgorithmExecutor {
     private static List<ExpressionResponse> getMostSimilarExpressionTo(String aTermExpression, String aContextExpression){
         List<ExpressionResponse> responses = new ArrayList<>();
         responses.add(getNewExpressionFrom(aTermExpression));
-        responses.add(getNewExpressionFrom(aContextExpression));
-        responses.add(getNewExpressionFrom(aContextExpression));
-        responses.add(getNewExpressionFrom(aContextExpression));
         return responses;
     }
 
+    private static ExpressionResponse getNewExpressionFrom(String baseExpression){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ExpressionResponse response = ExpressionResponse.empty();
+        int times = 0;
+        do {
+            try {
+                response = executor.submit(new Task(baseExpression)).get(5, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                System.out.println("\n\n\n\nTimeout: " + e.getMessage() + "\n\n\n\n");
+                for (Thread thread : Thread.getAllStackTraces().keySet()) {
+                    if (thread.getName().contains("pool-") && thread.getName().contains("thread-")) {
+                        System.out.println("Thread stopped: " + thread.getName());
+                        thread.stop();
+                    }
+                }
+            }
+            times++;
+        }while (!response.isValid() && times < 10);
 
-  private static ExpressionResponse getNewExpressionFrom(String baseExpression){
-      ExpressionResponse response;
-      do {
-      GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(baseExpression);
-      String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
-      Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
-      response = new ExpressionResponse(mostSimilarExpression, similarity);
-    }while(!response.isValid());
-
-    return response;
-  }
-
-  static class Task implements Callable<ExpressionResponse> {
-
-    private String baseExpression;
-
-    public Task(String aBaseExpression){
-      baseExpression = aBaseExpression;
+        return response;
     }
 
-    @Override
-    public ExpressionResponse call() throws Exception {
-      GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(this.baseExpression);
-      String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
-      Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
-      return new ExpressionResponse(mostSimilarExpression, similarity);
+    static class Task implements Callable<ExpressionResponse> {
+
+        private String baseExpression;
+
+        public Task(String aBaseExpression){
+            baseExpression = aBaseExpression;
+        }
+
+        @Override
+        public ExpressionResponse call() throws Exception {
+            GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(this.baseExpression);
+            String mostSimilarExpression = geneticAlgorithm.getExpressionMostSimilar();
+            Double similarity = geneticAlgorithm.getSimilarExpressionCalculator().similarityWith(mostSimilarExpression);
+            return new ExpressionResponse(mostSimilarExpression, similarity);
+        }
     }
-  }
 
 }

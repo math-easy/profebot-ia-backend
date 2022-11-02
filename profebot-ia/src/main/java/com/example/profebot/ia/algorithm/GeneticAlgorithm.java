@@ -20,6 +20,8 @@ import io.jenetics.ext.SingleNodeCrossover;
 import io.jenetics.ext.util.TreeNode;
 import io.jenetics.prog.ProgramGene;
 
+import java.time.Duration;
+
 public class GeneticAlgorithm {
 
   // Define the structure of solutions (max tree depth, operations and terminals to consider, etc)
@@ -32,7 +34,7 @@ public class GeneticAlgorithm {
   private static SimilarExpressionCalculator SIMILAR_EXPRESSION_CALCULATOR;
 
   public GeneticAlgorithm(String candidate) {
-    SIMILAR_EXPRESSION_CALCULATOR = new NeuralNetworkSimilarExpressionCalculator(candidate);
+    SIMILAR_EXPRESSION_CALCULATOR = new ProceduralSimilarExpressionCalculator(candidate);
   }
 
   public GeneticAlgorithm(String candidate, Boolean useNeuralNetworkFitness) {
@@ -66,7 +68,7 @@ public class GeneticAlgorithm {
         .build();
 
     Phenotype<ProgramGene<Double>, Double> bestExpression = engine.stream()
-        .limit(Limits.bySteadyFitness(MIN_ITERATIONS))
+        .limit(Limits.byExecutionTime(Duration.ofSeconds(1)))
         .peek(GeneticAlgorithm::showGeneration)
         .collect(EvolutionResult.toBestPhenotype());
 
